@@ -2,7 +2,7 @@
 Fs = 1000;              % Sampling frequency (Hz)
 f_c = 50;               % Carrier frequency (Hz)
 T = 1;                  % Duration of the signal (seconds)
-num_bits = 50;          % Number of bits
+num_bits = 20;          % Number of bits
 input_bits = randi([0 1], 1, num_bits); % Random binary sequence
 
 % Call the askModFunc function to get the modulated signal (ASK)
@@ -70,3 +70,9 @@ xlabel('Time (s)');
 ylabel('Amplitude');
 xlim([0 T]);
 grid on;
+
+features = featureExtraction(s_t_ask, Fs, T);
+
+% Display the extracted features
+disp(features);
+
