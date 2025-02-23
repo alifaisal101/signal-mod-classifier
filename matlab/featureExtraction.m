@@ -29,18 +29,10 @@ function features = featureExtraction(modulatedSignal, Fs, T)
     features.meanAbsDev = mean(abs(modulatedSignal - mean(modulatedSignal)));
     features.skewness = skewness(modulatedSignal);
     features.kurtosis = kurtosis(modulatedSignal);
-    features.entropy = -sum(Pxx .* log2(Pxx + eps)); % Avoid log(0) by adding eps
+    features.entropy = -sum(Pxx .* log2(Pxx + eps));
 
-    % Autocorrelation (for periodicity analysis)
     [acf, lags] = xcorr(modulatedSignal, 'coeff');
     features.autocorrPeak = max(acf);
 
-    % Harmonic Features (if you want to analyze harmonic content)
-    % Harmonics: A simple approach is to check if the signal has peaks in harmonics
-    % Can be used to determine harmonic content (if needed for further classification)
-    features.harmonics = find(Pxx > 0.1 * max(Pxx)); % Find significant harmonics
-
-    % Optional: Symbol Rate or Bit Rate (based on signal duration and modulation)
-    % This is more applicable when analyzing modulated signal that carries information
-    % Features could be symbol rate, bit rate, etc., depending on the modulation.
+    features.harmonics = find(Pxx > 0.1 * max(Pxx)); 
 end
