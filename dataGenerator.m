@@ -1,7 +1,10 @@
 clear all;
 
+% Initialize an empty cell array to store all the documents
+all_documents = {};
+
 % Define Parameters
-for i = 1:10000
+for i = 1:2000
     Fs = randi([500, 2000]);              % Sampling frequency (Hz)
     f_c = randi([10000, 100000]);         % Carrier frequency (Hz)
     T = randi([1, 100]);                  % Duration of the signal (seconds)
@@ -32,40 +35,27 @@ for i = 1:10000
     document_qpsk = struct('type', 'qpsk', 'features', features_qpsk);
     document_fsk = struct('type', 'fsk', 'features', features_fsk);
 
-    % Save documents to temporary files
-    jsonfile_ask = sprintf('temp_ask_%d.json', i);
-    jsonfile_bpsk = sprintf('temp_bpsk_%d.json', i);
-    jsonfile_qpsk = sprintf('temp_qpsk_%d.json', i);
-    jsonfile_fsk = sprintf('temp_fsk_%d.json', i);
+    % Add documents to the array
+    all_documents{end+1} = document_ask;
+    all_documents{end+1} = document_bpsk;
+    all_documents{end+1} = document_qpsk;
+    all_documents{end+1} = document_fsk;
 
-    % Save to JSON files
-    fid_ask = fopen(jsonfile_ask, 'w');
-    fwrite(fid_ask, jsonencode(document_ask));
-    fclose(fid_ask);
-
-    fid_bpsk = fopen(jsonfile_bpsk, 'w');
-    fwrite(fid_bpsk, jsonencode(document_bpsk));
-    fclose(fid_bpsk);
-
-    fid_qpsk = fopen(jsonfile_qpsk, 'w');
-    fwrite(fid_qpsk, jsonencode(document_qpsk));
-    fclose(fid_qpsk);
-
-    fid_fsk = fopen(jsonfile_fsk, 'w');
-    fwrite(fid_fsk, jsonencode(document_fsk));
-    fclose(fid_fsk);
-
-    % Call Python function to insert data from file
-    system(['python insert_data_to_mongodb.py ', jsonfile_ask]);
-    system(['python insert_data_to_mongodb.py ', jsonfile_bpsk]);
-    system(['python insert_data_to_mongodb.py ', jsonfile_qpsk]);
-    system(['python insert_data_to_mongodb.py ', jsonfile_fsk]);
-
-    % Delete temporary files after insertion
-    delete(jsonfile_ask);
-    delete(jsonfile_bpsk);
-    delete(jsonfile_qpsk);
-    delete(jsonfile_fsk);
-
-    fprintf('Iteration %d: Data inserted into MongoDB.\n', i);
+    fprintf('Iteration %d: Document created.\n', i);
 end
+
+% Save all documents to a JSON file after the loop
+jsonfile_all = 'all_documents.json';
+fid_all = fopen(jsonfile_all, 'w');
+fwrite(fid_all, jsonencode(all_documents));
+fclose(fid_all);
+
+fprintf('All documents saved to JSON file.\n');
+
+% Run the Python script to insert the data into MongoDB
+system(['python insert_data_to_mongodb.py ', jsonfile_all]);
+
+% Delete the temporary JSON file after insertion
+delete(jsonfile_all);
+
+fprintf('JSON file deleted after insertion.\n');
