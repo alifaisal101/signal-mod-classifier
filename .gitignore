@@ -1,1 +1,4 @@
 slprj
+*.npy
+*.h5
+*.bmp
