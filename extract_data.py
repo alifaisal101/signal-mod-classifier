@@ -10,7 +10,7 @@ args = parser.parse_args()
 
 # Connect to MongoDB
 client = pymongo.MongoClient("mongodb://192.168.0.100:27017/")
-db = client["signal_data"]
+db = client["signal_data_snr_25_30"]
 collection = db["modulation_features"]
 
 # Extract data from MongoDB
@@ -87,8 +87,8 @@ try:
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
 
-    np.save('X_data_scaled.npy', X_scaled)
-    np.save('y_labels.npy', y)
+    np.save('X_data_scaled_snr_25_30.npy', X_scaled)
+    np.save('y_labels_snr_25_30.npy', y)
 
     if args.verbose:
         print(f"Data loaded and processed: {X.shape[0]} samples")

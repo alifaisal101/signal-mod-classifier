@@ -4,7 +4,7 @@ from pymongo import MongoClient
 
 # Connect to MongoDB
 client = MongoClient("mongodb://192.168.0.100:27017/")
-db = client["signal_data"]
+db = client["signal_data_snr_25_30"]
 collection = db["modulation_features"]
 
 # Get the JSON file path from the command line argument
