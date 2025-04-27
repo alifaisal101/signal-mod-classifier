@@ -1,7 +1,9 @@
 clc;
 clear;
 
-fprintf("🚀 Generating stratified randomized spectrogram dataset parts...\n");
+% Will generate many parts. Useful for very large datasets
+
+fprintf("Generating stratified randomized spectrogram dataset parts...\n");
 
 % === Config ===
 image_size = [128 128];
@@ -23,6 +25,7 @@ mod_config = {
 };
 
 % === Build class table ===
+% Table will help us keep track of how many samples are left to be generated
 type_list = {};
 for i = 1:size(mod_config, 1)
     mod_type = mod_config{i, 1};
@@ -48,7 +51,7 @@ if ~exist(output_base, 'dir'), mkdir(output_base); end
 part_idx = 1;
 
 while any(cell2mat(type_list(:, 5)) > 0)
-    fprintf("🧩 Generating part %d...\n", part_idx);
+    fprintf("Generating part %d...\n", part_idx);
     part_spectrograms = zeros([image_size, 1, samples_per_part], 'single');
     part_labels = strings(samples_per_part, 1);
     idx = 1;
@@ -117,7 +120,7 @@ while any(cell2mat(type_list(:, 5)) > 0)
                 part_labels(idx) = label_key;
                 idx = idx + 1;
             catch ME
-                warning("⚠️ Skipping sample due to error: %s", ME.message);
+                warning("Skipping sample due to error: %s", ME.message);
                 continue;
             end
         end
@@ -130,11 +133,11 @@ while any(cell2mat(type_list(:, 5)) > 0)
     % Save this part
     out_path = fullfile(output_base, sprintf('Part_%d_MixedStratified.mat', part_idx));
     save(out_path, 'part_spectrograms', 'part_labels', '-v7.3');
-    fprintf("💾 Saved part %d (%d samples)\n", part_idx, idx-1);
+    fprintf("Saved part %d (%d samples)\n", part_idx, idx-1);
     part_idx = part_idx + 1;
 end
 
-fprintf("✅ All parts generated with balanced representation.\n");
+fprintf("All parts generated with balanced representation.\n");
 
 % === Padding Helper ===
 function padded = pad_or_truncate(sig, target_len)

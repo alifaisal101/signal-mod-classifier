@@ -1,7 +1,7 @@
 clc;
 clear;
 
-fprintf("📊 Full Evaluation on Valid Modulation + M Combinations\n");
+fprintf("Full Evaluation on Valid Modulation + M Combinations\n");
 
 % === Load model ===
 load('trainedSimpleCNN_SpectrogramSNR.mat', 'trainedNet');
@@ -13,13 +13,14 @@ f_c = 2000;
 desired_signal_len = 8000;
 image_size = [128 128];
 input_bits = randi([0 1], 1, 1000);
+SNR_Value = Inf;
 
 % === Modulation types and valid M values ===
 mod_config = {
     'ASK',     [2, 4, 8, 16, 32, 64];
     'FSK',     [2, 4, 8, 16, 32, 64];
     'PSK',     [2, 4, 8, 16, 32, 64];
-    'QAM',     [4, 16, 32, 64];  % Removed QAM_2
+    'QAM',     [4, 16, 32, 64];
     'Chirp',   [2, 4, 8, 16, 32, 64];
     'DQPSK',   [4]
 };
@@ -40,7 +41,6 @@ for i = 1:size(mod_config, 1)
         true_label = sprintf('%s_%d', mod_type, M);
 
         try
-            % Generate signal
             switch mod_type
                 case 'ASK'
                     [sig, ~] = askMModulate(input_bits, Fs, f_c, T, M);
@@ -59,14 +59,13 @@ for i = 1:size(mod_config, 1)
             end
 
             % Add AWGN
-            sig = awgn(sig, 5, 'measured');
+            sig = awgn(sig, SNR_Value, 'measured');
 
         catch
-            warning("⚠️ Failed to generate %s_%d", mod_type, M);
+            warning(" Failed to generate %s_%d", mod_type, M);
             continue;
         end
 
-        % Pad or truncate
         if length(sig) > desired_signal_len
             sig = sig(1:desired_signal_len);
         elseif length(sig) < desired_signal_len
@@ -88,9 +87,9 @@ for i = 1:size(mod_config, 1)
         top2_label = class_labels(idx(2));
         top3_label = class_labels(idx(3));
         is_correct = strcmp(string(top1_label), true_label);
-        status = "✅";
+        status = "";
         if ~is_correct
-            status = "❌";
+            status = "";
         end
 
         % === Store result ===
@@ -105,7 +104,7 @@ for i = 1:size(mod_config, 1)
             sprintf('%.2f%%', sorted_probs(3) * 100)
         };
 
-        fprintf("%s %s → %s (%.2f%%)\n", status, true_label, top1_label, sorted_probs(1) * 100);
+        fprintf("%s %s  %s (%.2f%%)\n", status, true_label, top1_label, sorted_probs(1) * 100);
     end
 end
 
@@ -114,16 +113,16 @@ results_table = cell2table(results, ...
     'VariableNames', {'Status', 'TrueLabel', 'Prediction', ...
     'Top1Prob', 'Top2', 'Top2Prob', 'Top3', 'Top3Prob'});
 
-fprintf("\n📋 Final Results Table:\n");
+fprintf("\n Final Results Table:\n");
 disp(results_table);
 
 % === Accuracy Summary ===
 correct_count = sum(strcmp(results_table.TrueLabel, results_table.Prediction));
 total_count = size(results_table, 1);
 accuracy = correct_count / total_count * 100;
-fprintf("✅ Overall Accuracy: %.2f%% (%d / %d)\n", accuracy, correct_count, total_count);
+fprintf(" Overall Accuracy: %.2f%% (%d / %d)\n", accuracy, correct_count, total_count);
 
 % === Misclassifications ===
-fprintf("\n❌ Misclassifications:\n");
+fprintf("\n Misclassifications:\n");
 misclassified = results_table(~strcmp(results_table.TrueLabel, results_table.Prediction), :);
 disp(misclassified);
