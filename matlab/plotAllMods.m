@@ -19,7 +19,6 @@ BT = 0.3;
 [psk, ~] = pskMModulate(input_bits, Fs, f_c, T, M);
 [qam, ~] = qamMModulate(input_bits, Fs, f_c, T, M);
 [chirp, ~] = chirpModulate(input_bits, Fs, T, M);
-[gmsk, ~] = gmskModulate(input_bits, Fs, BT, symbol_rate);
 [dpsk, ~] = dpskMModulate(input_bits, Fs, f_c, T, M);
 
 % Modulation setup
