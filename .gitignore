@@ -2,3 +2,11 @@ slprj
 *.npy
 *.h5
 *.bmp
+*.tmp
+*.pdf
+~$doc.*
+*.png
+*.fig
+*.svg
+*.mat
+*.drawio.bkp
